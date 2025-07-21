@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Interaktif Bisnis - Jualan, untuk Pelajaran Sekolah - oleh: ISPARMO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive;
+        }
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border-radius: .4em;
+            padding: 1rem;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+            border-top-color: #ffffff;
+            border-bottom: 0;
+            border-left: 0;
+            margin-left: -10px;
+            margin-bottom: -20px;
+        }
+        .shine-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: all 650ms;
+        }
+        .shine-button:hover::before {
+            left: 100%;
+        }
+        .buy-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        @media print {
+            body > *:not(#end-game-screen) {
+                display: none;
+            }
+            #end-game-screen {
+                display: flex !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-sky-100 text-gray-800">
+
+    <!-- Kontainer Utama Game -->
+    <div id="game-container" class="container mx-auto p-4 max-w-5xl">
+
+        <!-- Layar Mulai -->
+        <div id="start-screen" class="text-center p-8 bg-white rounded-2xl shadow-xl">
+            <h1 class="text-5xl font-bold text-sky-500 mb-2">Warung Sekolah Ceria</h1>
+            <p class="text-xl mb-4">Ayo Belajar Jualan & Jadi Pengusaha Sejak Dini</p>
+            
+            <div class="max-w-md mx-auto text-left space-y-4 mb-6">
+                <div>
+                    <label for="player-name" class="block text-lg font-semibold mb-1">Nama Kamu:</label>
+                    <input type="text" id="player-name" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Contoh: Budi">
+                </div>
+                <div>
+                    <label for="player-class" class="block text-lg font-semibold mb-1">Kelas:</label>
+                    <input type="text" id="player-class" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Contoh: 4 SD">
+                </div>
+                <div>
+                    <label for="api-key" class="block text-lg font-semibold mb-1">Kode API Gemini:</label>
+                    <input type="password" id="api-key" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Masukkan Kode API di sini">
+                </div>
+                <details class="bg-gray-100 p-2 rounded-lg">
+                    <summary class="cursor-pointer font-semibold text-gray-700">Bagaimana cara mendapatkan Kode API Gemini?</summary>
+                    <ol class="list-decimal list-inside text-sm mt-2 space-y-1">
+                        <li>Buka situs <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 hover:underline">Google AI Studio</a>.</li>
+                        <li>Masuk dengan akun Google kamu.</li>
+                        <li>Klik tombol "Create API key in new project".</li>
+                        <li>Salin (copy) kode yang muncul dan tempel (paste) di kolom atas.</li>
+                    </ol>
+                </details>
+            </div>
+
+            <button id="start-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-2xl shadow-lg transition-transform transform hover:scale-105">
+                Mulai Main!
+            </button>
+        </div>
+
+        <!-- Layar Game Utama (Awalnya Tersembunyi) -->
+        <div id="main-game" class="hidden">
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-md mb-6">
+                <div id="status-modal" class="text-2xl font-bold text-green-600">Modal: Rp 100.000</div>
+                <div id="status-hari" class="text-2xl font-bold text-sky-600">Hari ke: 1 / 7</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-3xl font-bold text-orange-500 mb-4">?? Grosir</h2>
+                    <div id="grosir-items" class="space-y-3"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-3xl font-bold text-teal-500">?? Warungku</h2>
+                            <button id="advice-button" class="shine-button relative overflow-hidden bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold py-2 px-4 rounded-full text-sm shadow-lg transition-transform transform hover:scale-105">
+                                ? Tanya Mentor Bisnis
+                            </button>
+                        </div>
+                        <div id="warung-items" class="space-y-3 mb-4"></div>
+                        <hr>
+                    </div>
+                    <div class="flex-grow flex flex-col min-h-0">
+                        <!-- Laporan Arsip -->
+                        <div id="archive-report-section" class="mt-4 hidden flex-shrink-0">
+                            <h4 class="font-bold text-lg text-gray-600 mb-2">Arsip Laporan Harian</h4>
+                            <div id="archive-list" class="space-y-2 max-h-24 overflow-y-auto pr-2"></div>
+                        </div>
+                        <!-- Laporan Live Hari Ini -->
+                        <div id="live-report-section" class="mt-2 flex-grow flex flex-col min-h-0">
+                            <h4 class="font-bold text-lg text-blue-600 flex-shrink-0">Penjualan Hari Ini:</h4>
+                            <div id="live-sales-report" class="text-sm space-y-1 flex-grow overflow-y-auto pr-2">
+                                <p class="text-gray-500">Belum ada penjualan...</p>
+                            </div>
+                            <div id="live-sales-total" class="text-right font-bold text-blue-800 mt-2 flex-shrink-0">Total: Rp 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <button id="day-action-button" data-state="forecast" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full text-2xl shadow-lg transition-transform transform hover:scale-105">
+                    Lihat Informasi Acara Sekolah Hari Ini
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal/Popup (Awalnya Tersembunyi) -->
+    <div id="popup-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50 p-4">
+        
+        <div id="rules-popup" class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full hidden">
+            <div class="text-6xl mb-4">??</div>
+            <h3 class="text-3xl font-bold text-sky-500 mb-4">Cara Main</h3>
+            <ul class="text-left space-y-3 text-lg mb-6">
+                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Lihat "Informasi Acara Sekolah Hari Ini" untuk dapat bocoran.</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Belanja barang di 'Grosir' sesuai informasi acara hari ini.</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Layani pelanggan untuk dapat uang.</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Dapatkan untung terbesar selama 7 hari!</li>
+            </ul>
+            <button id="rules-ok-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full text-xl">Mengerti!</button>
+        </div>
+
+        <div id="customer-popup" class="bg-white rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full hidden">
+            <img id="customer-avatar" src="https://placehold.co/100x100/FEF08A/333333?text=Anak" alt="Avatar pelanggan" class="mx-auto rounded-full mb-4 border-4 border-yellow-300">
+            <div class="speech-bubble">
+                <p id="customer-request" class="text-lg font-semibold"></p>
+            </div>
+            <div id="customer-feedback" class="mt-4 text-xl font-bold"></div>
+        </div>
+
+        <div id="generic-popup" class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-sm w-full hidden">
+            <div id="generic-popup-icon" class="text-6xl mb-4">??</div>
+            <h3 id="generic-popup-title" class="text-3xl font-bold text-yellow-500 mb-2"></h3>
+            <p id="generic-popup-description" class="text-lg"></p>
+            <button id="generic-popup-ok-button" class="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-full">Asiiik!</button>
+        </div>
+
+        <!-- Popup Laporan Harian -->
+        <div id="daily-summary-popup" class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-xl w-full hidden">
+            <h3 id="daily-summary-title" class="text-3xl font-bold text-sky-500 mb-4">Laporan Hari ke-1</h3>
+            <div id="daily-summary-details" class="text-left text-sm border rounded-lg p-2 max-h-80 overflow-y-auto mb-4">
+                <!-- Konten laporan detail akan dimasukkan di sini oleh JS -->
+            </div>
+            <div id="daily-summary-buttons" class="flex justify-center items-center gap-4">
+                <button id="download-report-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full text-lg">Download Laporan</button>
+                <button id="continue-to-next-day-button" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-full text-lg">Lanjut ke Hari Berikutnya</button>
+                <button id="close-summary-button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full text-lg hidden">Tutup</button>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- Layar Akhir Permainan Full Screen -->
+    <div id="end-game-screen" class="bg-white w-full h-full p-8 flex-col items-center justify-center hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="w-full max-w-4xl mx-auto text-center">
+            <div class="text-6xl mb-4 no-print">??</div>
+            <h3 class="text-4xl font-bold text-green-500 mb-2">Laporan Penjualan Warung Cilik Ceria Selama 7 Hari</h3>
+            <div id="final-report-header" class="text-lg mb-4"></div>
+            <div id="final-report-details" class="text-left border rounded-lg p-2 max-h-64 overflow-y-auto mb-4"></div>
+            
+            <div id="final-summary-section" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center my-4">
+                <!-- Diisi oleh JS -->
+            </div>
+
+            <div id="final-advice-section" class="bg-sky-50 p-4 rounded-lg text-left">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xl font-bold text-sky-700">Kesimpulan dari Mentor Bisnis AI</h4>
+                    <button id="download-advice-button" class="no-print text-xs bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600">Download HTML</button>
+                </div>
+                <div id="final-advice-text" class="text-gray-700">
+                    <p>Menganalisis hasil...</p>
+                </div>
+            </div>
+
+            <details class="bg-gray-100 p-3 rounded-lg text-left my-4">
+                <summary class="cursor-pointer font-semibold text-gray-700">Keterangan Istilah</summary>
+                <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                    <li><strong>Modal Awal:</strong> Uang yang kamu punya di awal hari.</li>
+                    <li><strong>Total Jual:</strong> Total uang yang kamu dapat dari semua penjualan hari itu.</li>
+                    <li><strong>Total HPP:</strong> Total modal dari barang-barang yang laku terjual.</li>
+                    <li><strong>Untung/Rugi:</strong> Hasil dari Total Jual dikurangi Total HPP.</li>
+                    <li><strong>Sisa Nilai Stok:</strong> Nilai semua barang yang tidak laku, dihitung dari harga belinya.</li>
+                    <li><strong>Modal Akhir:</strong> Uang yang kamu punya di akhir hari setelah berjualan.</li>
+                    <li><strong>BEP (Break-Even Point):</strong> Hari di mana total keuntunganmu pertama kali berhasil menutupi semua kerugian sebelumnya (balik modal).</li>
+                </ul>
+            </details>
+
+            <div class="mt-6 flex justify-center gap-4 no-print">
+                <button id="download-final-html-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl">Download Laporan (HTML)</button>
+                <button id="download-final-csv-button" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-full text-xl">Download Laporan (CSV)</button>
+                <button id="play-again-button" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full text-xl">Main Lagi</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Konfigurasi Game ---
+        const DAFTAR_BARANG = {
+            'Permen': { emoji: '?', hargaBeli: 500 },
+            'Cokelat': { emoji: '??', hargaBeli: 2000 },
+            'Es Krim': { emoji: '??', hargaBeli: 3000 },
+            'Minuman': { emoji: '??', hargaBeli: 2500 },
+            'Keripik': { emoji: '??', hargaBeli: 1500 },
+            'Roti': { emoji: '??', hargaBeli: 4000 },
+        };
+        const MODAL_AWAL = 25000;
+        const TOTAL_HARI = 7;
+        const MARKUP_HARGA = 1.25;
+
+        // --- Variabel Status Game ---
+        let modal, hari, stokWarung, isProcessingDay, dayStartModal, dailySalesLog;
+        let dailyReport = [];
+        let currentDayData = null;
+        let userApiKey = "";
+        let finalAdviceContent = "";
+        let playerName = "";
+        let playerClass = "";
+
+        // --- Elemen DOM ---
+        const startScreen = document.getElementById('start-screen');
+        const mainGame = document.getElementById('main-game');
+        const statusModal = document.getElementById('status-modal');
+        const statusHari = document.getElementById('status-hari');
+        const grosirItemsContainer = document.getElementById('grosir-items');
+        const warungItemsContainer = document.getElementById('warung-items');
+        const liveSalesReport = document.getElementById('live-sales-report');
+        const liveSalesTotal = document.getElementById('live-sales-total');
+        const archiveReportSection = document.getElementById('archive-report-section');
+        const dayActionButton = document.getElementById('day-action-button');
+        const adviceButton = document.getElementById('advice-button');
+        const popupOverlay = document.getElementById('popup-overlay');
+        const rulesPopup = document.getElementById('rules-popup');
+        const rulesOkButton = document.getElementById('rules-ok-button');
+        const customerPopup = document.getElementById('customer-popup');
+        const customerAvatar = document.getElementById('customer-avatar');
+        const customerRequest = document.getElementById('customer-request');
+        const customerFeedback = document.getElementById('customer-feedback');
+        const genericPopup = document.getElementById('generic-popup');
+        const genericPopupIcon = document.getElementById('generic-popup-icon');
+        const genericPopupTitle = document.getElementById('generic-popup-title');
+        const genericPopupDescription = document.getElementById('generic-popup-description');
+        const genericPopupOkButton = document.getElementById('generic-popup-ok-button');
+        const dailySummaryPopup = document.getElementById('daily-summary-popup');
+        const downloadReportButton = document.getElementById('download-report-button');
+        const continueToNextDayButton = document.getElementById('continue-to-next-day-button');
+        const closeSummaryButton = document.getElementById('close-summary-button');
+        const endGameScreen = document.getElementById('end-game-screen');
+        const finalReportHeader = document.getElementById('final-report-header');
+        const finalReportDetails = document.getElementById('final-report-details');
+        const finalSummarySection = document.getElementById('final-summary-section');
+        const finalAdviceText = document.getElementById('final-advice-text').parentElement;
+        const downloadAdviceButton = document.getElementById('download-advice-button');
+        const downloadFinalHTMLButton = document.getElementById('download-final-html-button');
+        const downloadFinalCSVButton = document.getElementById('download-final-csv-button');
+        const playAgainButton = document.getElementById('play-again-button');
+
+        // --- Fungsi-Fungsi Game ---
+
+        function initGame() {
+            modal = MODAL_AWAL;
+            hari = 1;
+            stokWarung = {};
+            dailyReport = [];
+            isProcessingDay = false;
+            currentDayData = null;
+            finalAdviceContent = "";
+            
+            [mainGame, popupOverlay, rulesPopup, customerPopup, genericPopup, dailySummaryPopup, endGameScreen].forEach(el => el.classList.add('hidden'));
+            archiveReportSection.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            updateTampilan();
+            updateLiveSalesReport();
+        }
+
+        function startGame() {
+            playerName = document.getElementById('player-name').value;
+            playerClass = document.getElementById('player-class').value;
+            const apiKeyInput = document.getElementById('api-key').value;
+
+            if (!playerName || !playerClass) {
+                showGenericPopup("??", "Oops!", "Nama dan Kelas harus diisi ya.");
+                return;
+            }
+            if (!apiKeyInput) {
+                showGenericPopup("??", "Oops!", "Kamu harus memasukkan Kode API Gemini untuk bermain.");
+                return;
+            }
+            userApiKey = apiKeyInput;
+
+            popupOverlay.classList.remove('hidden');
+            rulesPopup.classList.remove('hidden');
+        }
+
+        function proceedToGame() {
+            popupOverlay.classList.add('hidden');
+            rulesPopup.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            mainGame.classList.remove('hidden');
+            resetDayActionButton();
+            renderGrosir();
+            updateTampilan();
+        }
+
+        function formatUang(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        }
+
+        function updateTampilan() {
+            statusModal.innerText = `Modal: ${formatUang(modal)}`;
+            statusHari.innerText = `Hari ke: ${hari} / ${TOTAL_HARI}`;
+            warungItemsContainer.innerHTML = '';
+            if (Object.keys(stokWarung).length === 0 || Object.values(stokWarung).every(s => s === 0)) {
+                warungItemsContainer.innerHTML = '<p class="text-gray-500">Kamu belum punya barang. Ayo belanja di grosir!</p>';
+            } else {
+                for (const namaBarang in stokWarung) {
+                    if (stokWarung[namaBarang] > 0) {
+                        const barangInfo = DAFTAR_BARANG[namaBarang];
+                        const hargaJual = Math.ceil(barangInfo.hargaBeli * MARKUP_HARGA / 100) * 100;
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'flex justify-between items-center bg-teal-50 p-3 rounded-lg';
+                        itemDiv.innerHTML = `<div><span class="text-2xl">${barangInfo.emoji}</span> <span class="font-semibold ml-2">${namaBarang}</span></div><div><span class="text-teal-700 font-bold">Stok: ${stokWarung[namaBarang]}</span><span class="ml-4 text-gray-600">Jual: ${formatUang(hargaJual)}</span></div>`;
+                        warungItemsContainer.appendChild(itemDiv);
+                    }
+                }
+            }
+        }
+
+        function updateLiveSalesReport() {
+            if (!dailySalesLog || dailySalesLog.length === 0) {
+                liveSalesReport.innerHTML = '<p class="text-gray-500">Belum ada penjualan...</p>';
+                liveSalesTotal.innerText = 'Total: Rp 0';
+                return;
+            }
+
+            liveSalesReport.innerHTML = '';
+            let totalRevenue = 0;
+            dailySalesLog.forEach(sale => {
+                const saleDiv = document.createElement('div');
+                saleDiv.className = 'flex justify-between items-center';
+                saleDiv.innerHTML = `<span>${DAFTAR_BARANG[sale.item].emoji} ${sale.item} (x${sale.quantity})</span><span>+ ${formatUang(sale.revenue)}</span>`;
+                liveSalesReport.appendChild(saleDiv);
+                totalRevenue += sale.revenue;
+            });
+            liveSalesTotal.innerText = `Total: ${formatUang(totalRevenue)}`;
+        }
+        
+        function renderGrosir() {
+            grosirItemsContainer.innerHTML = '';
+            for (const namaBarang in DAFTAR_BARANG) {
+                const barang = DAFTAR_BARANG[namaBarang];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-center bg-orange-50 p-3 rounded-lg';
+                itemDiv.innerHTML = `<div><span class="text-2xl">${barang.emoji}</span> <span class="font-semibold ml-2">${namaBarang}</span> <span class="text-gray-600 ml-2">(Beli: ${formatUang(barang.hargaBeli)})</span></div><button class="buy-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-1 px-4 rounded-full transition-transform transform hover:scale-110" data-item="${namaBarang}">Beli</button>`;
+                grosirItemsContainer.appendChild(itemDiv);
+            }
+        }
+
+        function beliBarang(namaBarang) {
+            if (dayActionButton.dataset.state !== 'shop') return;
+            const barang = DAFTAR_BARANG[namaBarang];
+            if (modal >= barang.hargaBeli) {
+                modal -= barang.hargaBeli;
+                stokWarung[namaBarang] = (stokWarung[namaBarang] || 0) + 1;
+                updateTampilan();
+            } else {
+                showGenericPopup("??", "Oops!", "Wah, uangmu tidak cukup untuk membeli itu!");
+            }
+        }
+
+        function toggleGrosirButtons(enabled) {
+            document.querySelectorAll('.buy-button').forEach(button => {
+                button.disabled = !enabled;
+            });
+        }
+
+        async function handleDayAction() {
+            const state = dayActionButton.dataset.state;
+            if (state === 'forecast') {
+                dayActionButton.disabled = true;
+                dayActionButton.innerText = "Melihat Informasi Acara...";
+                dayStartModal = modal;
+                dailySalesLog = [];
+                updateLiveSalesReport();
+                try {
+                    currentDayData = await getDailyScenarioFromGemini();
+                    if (currentDayData && currentDayData.event && typeof currentDayData.event.description !== 'undefined' && currentDayData.customers) {
+                        showGenericPopup("??", "Informasi Acara Sekolah Hari Ini", currentDayData.event.description, () => {
+                            dayActionButton.dataset.state = 'shop';
+                            dayActionButton.innerText = "Mulai Layani Pelanggan";
+                            dayActionButton.disabled = false;
+                            toggleGrosirButtons(true);
+                        });
+                    } else {
+                        console.error("Invalid data structure from Gemini:", currentDayData);
+                        throw new Error("Gagal memproses data dari AI. Struktur data tidak sesuai.");
+                    }
+                } catch (error) {
+                    let errorMessage = "Gagal mendapat informasi dari Gemini. Coba lagi.";
+                    if (error.message.includes("400")) {
+                        errorMessage = "Gagal mendapat informasi. Periksa kembali Kode API Gemini kamu, sepertinya tidak valid.";
+                    } else if (error.message.includes("JSON yang valid")) {
+                        errorMessage = "Terjadi kesalahan saat memproses data dari AI. Silakan coba lagi.";
+                    } else if (error.message.includes("Struktur data tidak sesuai")) {
+                        errorMessage = "Gagal memproses data dari AI karena struktur tidak sesuai. Coba lagi.";
+                    }
+                    console.error(error); // Log the full error for debugging
+                    showGenericPopup("??", "Error", errorMessage, resetDayActionButton);
+                }
+            } else if (state === 'shop') {
+                dayActionButton.disabled = true;
+                dayActionButton.innerText = "Sedang Berjualan...";
+                toggleGrosirButtons(false);
+                await prosesAntrianPelanggan(currentDayData.customers);
+                endOfDay();
+            }
+        }
+
+        function endOfDay() {
+            const dailyProfit = modal - dayStartModal;
+            const soldItemsSummary = {};
+            dailySalesLog.forEach(sale => {
+                soldItemsSummary[sale.item] = (soldItemsSummary[sale.item] || 0) + sale.quantity;
+            });
+
+            const reportData = {
+                day: hari,
+                start: dayStartModal,
+                end: modal,
+                profit: dailyProfit,
+                sold: soldItemsSummary,
+                salesLog: [...dailySalesLog],
+                unsold: { ...stokWarung }
+            };
+            dailyReport.push(reportData);
+            showDailySummary(reportData, false);
+        }
+
+        function prepareNextDay() {
+            if (hari >= TOTAL_HARI) {
+                akhirGame();
+            } else {
+                hari++;
+                renderArchiveReports();
+                resetDayActionButton();
+                updateTampilan();
+                updateLiveSalesReport();
+            }
+        }
+
+        function resetDayActionButton() {
+            dayActionButton.dataset.state = 'forecast';
+            dayActionButton.innerText = "Lihat Informasi Acara Sekolah Hari Ini";
+            dayActionButton.disabled = false;
+            toggleGrosirButtons(false);
+        }
+
+        async function prosesAntrianPelanggan(antrian) {
+            for (const pelanggan of antrian) {
+                await prosesSatuPelanggan(pelanggan);
+            }
+        }
+
+        function prosesSatuPelanggan(pelanggan) {
+            return new Promise(resolve => {
+                const { name, requestItem, quantity } = pelanggan;
+                const barangInfo = DAFTAR_BARANG[requestItem];
+                if (!barangInfo) { resolve(); return; }
+                const hargaJual = Math.ceil(barangInfo.hargaBeli * MARKUP_HARGA / 100) * 100;
+                
+                customerAvatar.src = `https://placehold.co/100x100/FEF08A/333333?text=${name.charAt(0)}`;
+                customerRequest.innerText = `Halo, aku ${name}! Aku mau beli ${requestItem} ${quantity} buah.`;
+                customerFeedback.innerText = '';
+                popupOverlay.classList.remove('hidden');
+                customerPopup.classList.remove('hidden');
+
+                setTimeout(() => {
+                    const availableStock = stokWarung[requestItem] || 0;
+                    if (availableStock > 0) {
+                        const quantityToSell = Math.min(availableStock, quantity);
+                        const quantityMissing = quantity - quantityToSell;
+
+                        const revenue = quantityToSell * hargaJual;
+                        const profitPerSale = revenue - (quantityToSell * barangInfo.hargaBeli);
+                        stokWarung[requestItem] -= quantityToSell;
+                        modal += revenue;
+                        dailySalesLog.push({ 
+                            item: requestItem, 
+                            quantity: quantityToSell, 
+                            revenue, 
+                            hargaBeli: barangInfo.hargaBeli, 
+                            hargaJual, 
+                            profit: profitPerSale 
+                        });
+                        updateLiveSalesReport();
+                        
+                        if (quantityMissing > 0) {
+                            customerFeedback.innerText = `Maaf kurang ${quantityMissing} buah karena stok kurang`;
+                            customerFeedback.className = 'mt-4 text-xl font-bold text-orange-500';
+                        } else {
+                            customerFeedback.innerText = 'Terima kasih! ??';
+                            customerFeedback.className = 'mt-4 text-xl font-bold text-green-500';
+                        }
+                    } else {
+                        customerFeedback.innerText = 'Yah, habis... ??';
+                        customerFeedback.className = 'mt-4 text-xl font-bold text-red-500';
+                    }
+                    updateTampilan();
+                    setTimeout(() => {
+                        popupOverlay.classList.add('hidden');
+                        customerPopup.classList.add('hidden');
+                        resolve();
+                    }, 2500);
+                }, 1500);
+            });
+        }
+        
+        async function akhirGame() {
+            mainGame.classList.add('hidden');
+            popupOverlay.classList.add('hidden'); // Hide any open popups
+            endGameScreen.style.display = 'flex';
+            renderFinalReportHeader();
+            renderFinalReport();
+            renderFinalSummary();
+            try {
+                const advice = await getFinalAdviceFromGemini();
+                finalAdviceContent = advice; // Store raw HTML
+                finalAdviceText.innerHTML = advice;
+            } catch (error) {
+                finalAdviceText.innerText = "Gagal mendapatkan saran dari mentor AI. Tapi kamu tetap hebat!";
+                finalAdviceContent = `<p>${finalAdviceText.innerText}</p>`;
+            }
+        }
+
+        function showDailySummary(reportData, isArchive = false) {
+            document.getElementById('daily-summary-title').innerText = `Laporan Hari ke-${reportData.day}`;
+            const detailsContainer = document.getElementById('daily-summary-details');
+
+            let totalRevenue = 0;
+            let totalCogs = 0;
+            let totalQtySold = 0;
+            let totalProfit = 0;
+            let soldItemsHTML = '';
+            if (reportData.salesLog.length > 0) {
+                reportData.salesLog.forEach(sale => {
+                    const cogsPerItem = sale.quantity * sale.hargaBeli;
+                    totalRevenue += sale.revenue;
+                    totalCogs += cogsPerItem;
+                    totalQtySold += sale.quantity;
+                    totalProfit += sale.profit;
+                    soldItemsHTML += `<tr class="border-b">
+                            <td class="p-1">${DAFTAR_BARANG[sale.item].emoji} ${sale.item}</td>
+                            <td class="p-1 text-right">${formatUang(sale.hargaBeli)}</td>
+                            <td class="p-1 text-right">${formatUang(sale.hargaJual)}</td>
+                            <td class="p-1 text-right">${sale.quantity}</td>
+                            <td class="p-1 text-right">${formatUang(cogsPerItem)}</td>
+                            <td class="p-1 text-right">${formatUang(sale.revenue)}</td>
+                            <td class="p-1 text-right text-green-600 font-semibold">${formatUang(sale.profit)}</td>
+                        </tr>`;
+                });
+            } else {
+                soldItemsHTML = `<tr><td colspan="7" class="p-2 text-center text-gray-500">Tidak ada barang laku hari ini.</td></tr>`;
+            }
+
+            let totalStockValue = 0;
+            let unsoldItemsHTML = '';
+            if (Object.values(reportData.unsold).some(qty => qty > 0)) {
+                 for (const [item, qty] of Object.entries(reportData.unsold)) {
+                    if (qty > 0) {
+                        const itemValue = qty * DAFTAR_BARANG[item].hargaBeli;
+                        totalStockValue += itemValue;
+                        unsoldItemsHTML += `<tr>
+                            <td class="py-1 px-2">${DAFTAR_BARANG[item].emoji} ${item}</td>
+                            <td class="py-1 px-2 text-right">${formatUang(DAFTAR_BARANG[item].hargaBeli)}</td>
+                            <td class="py-1 px-2 text-right">${qty}</td>
+                            <td class="py-1 px-2 text-right">${formatUang(itemValue)}</td>
+                        </tr>`;
+                    }
+                }
+            } else {
+                unsoldItemsHTML = `<tr><td colspan="4" class="py-1 px-2 text-gray-500">Semua barang habis!</td></tr>`;
+            }
+
+            const netProfit = totalRevenue - totalCogs;
+            const profitClass = netProfit >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
+
+            detailsContainer.innerHTML = `
+                <h4 class="font-bold text-lg text-green-700">Rincian Penjualan:</h4>
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-1 text-left">Barang</th>
+                            <th class="p-1 text-right">H. Beli</th>
+                            <th class="p-1 text-right">H. Jual</th>
+                            <th class="p-1 text-right">Laku</th>
+                            <th class="p-1 text-right">HPP</th>
+                            <th class="p-1 text-right">Total Jual</th>
+                            <th class="p-1 text-right">Untung</th>
+                        </tr>
+                    </thead>
+                    <tbody>${soldItemsHTML}</tbody>
+                    <tfoot class="font-bold border-t-2">
+                        <tr>
+                            <td class="p-1" colspan="3">Total</td>
+                            <td class="p-1 text-right">${totalQtySold}</td>
+                            <td class="p-1 text-right">${formatUang(totalCogs)}</td>
+                            <td class="p-1 text-right">${formatUang(totalRevenue)}</td>
+                            <td class="p-1 text-right">${formatUang(totalProfit)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <h4 class="font-bold text-lg text-red-700 mt-4">Rincian Sisa Stok:</h4>
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-1 text-left">Barang</th>
+                            <th class="p-1 text-right">H. Beli</th>
+                            <th class="p-1 text-right">Jml Stok</th>
+                            <th class="p-1 text-right">Nilai Stok</th>
+                        </tr>
+                    </thead>
+                    <tbody>${unsoldItemsHTML}</tbody>
+                    <tfoot class="font-semibold border-t">
+                        <tr>
+                            <td colspan="3" class="p-1 text-left">Total Nilai Stok</td>
+                            <td class="p-1 text-right">${formatUang(totalStockValue)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="border-t-2 border-gray-400 mt-4 pt-2 space-y-1">
+                    <div class="flex justify-between"><span>Total Penjualan</span> <span>${formatUang(totalRevenue)}</span></div>
+                    <div class="flex justify-between"><span>Modal Barang Terjual (HPP)</span> <span>- ${formatUang(totalCogs)}</span></div>
+                    <div class="font-bold text-lg flex justify-between">
+                        <span>Keuntungan Bersih Hari Ini</span>
+                        <span class="p-1 rounded-lg ${profitClass}">${formatUang(netProfit)}</span>
+                    </div>
+                </div>
+            `;
+
+            downloadReportButton.onclick = () => downloadReportAsCSV(reportData);
+            
+            if (isArchive) {
+                continueToNextDayButton.classList.add('hidden');
+                closeSummaryButton.classList.remove('hidden');
+            } else {
+                continueToNextDayButton.classList.remove('hidden');
+                closeSummaryButton.classList.add('hidden');
+            }
+
+            popupOverlay.classList.remove('hidden');
+            dailySummaryPopup.classList.remove('hidden');
+        }
+
+        function renderArchiveReports() {
+            const archiveList = document.getElementById('archive-list');
+            if (dailyReport.length === 0) {
+                archiveReportSection.classList.add('hidden');
+                return;
+            };
+            
+            archiveList.innerHTML = ''; // Clear list
+            
+            dailyReport.forEach(report => {
+                const profitClass = report.profit >= 0 ? 'text-green-600' : 'text-red-600';
+                
+                const reportDiv = document.createElement('div');
+                reportDiv.className = 'text-sm bg-gray-100 p-2 rounded';
+                
+                const soldText = Object.keys(report.sold).length > 0
+                    ? Object.entries(report.sold).map(([item, qty]) => `${DAFTAR_BARANG[item].emoji} (x${qty})`).join(' ')
+                    : 'Tidak ada';
+                const unsoldText = Object.values(report.unsold).some(qty => qty > 0)
+                    ? Object.entries(report.unsold).filter(([,qty]) => qty > 0).map(([item, qty]) => `${DAFTAR_BARANG[item].emoji} (x${qty})`).join(' ')
+                    : 'Habis';
+
+                reportDiv.innerHTML = `
+                    <div class="font-semibold flex justify-between items-center">
+                        <span>Laporan Hari ke-${report.day}</span>
+                        <span class="font-bold ${profitClass}">${formatUang(report.profit)}</span>
+                    </div>
+                    <div class="text-xs mt-1">
+                        <div>Laku: ${soldText}</div>
+                        <div>Sisa Stok Barang: ${unsoldText}</div>
+                    </div>
+                    <div class="mt-2 flex justify-end space-x-2">
+                        <button class="view-detail-btn text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600" data-day="${report.day}">Lihat Detail</button>
+                        <button class="download-archive-btn text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" data-day="${report.day}">Download</button>
+                    </div>
+                `;
+                archiveList.appendChild(reportDiv);
+            });
+
+            archiveReportSection.classList.remove('hidden');
+        }
+        
+        function renderFinalReportHeader() {
+            finalReportHeader.innerHTML = `
+                <p><span class="font-semibold">Nama:</span> ${playerName}</p>
+                <p><span class="font-semibold">Kelas:</span> ${playerClass}</p>
+            `;
+        }
+
+        function renderFinalReport() {
+            let reportHTML = `<table class="w-full text-xs">
+                <thead class="font-bold bg-gray-100">
+                    <tr>
+                        <th class="p-2 text-left">Hari</th>
+                        <th class="p-2 text-right">Modal Awal</th>
+                        <th class="p-2 text-right">Total Jual</th>
+                        <th class="p-2 text-right">Total HPP</th>
+                        <th class="p-2 text-right">Untung/Rugi</th>
+                        <th class="p-2 text-right">Sisa Nilai Stok</th>
+                        <th class="p-2 text-right">Modal Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            dailyReport.forEach(r => {
+                const profitClass = r.profit >= 0 ? 'text-green-600' : 'text-red-600';
+                let totalRevenue = 0;
+                let totalCogs = 0;
+                r.salesLog.forEach(sale => {
+                    totalRevenue += sale.revenue;
+                    totalCogs += sale.quantity * sale.hargaBeli;
+                });
+                let totalStockValue = 0;
+                for (const [item, qty] of Object.entries(r.unsold)) {
+                    if (qty > 0) totalStockValue += qty * DAFTAR_BARANG[item].hargaBeli;
+                }
+
+                reportHTML += `<tr class="border-t">
+                    <td class="p-2 font-bold">${r.day}</td>
+                    <td class="p-2 text-right">${formatUang(r.start)}</td>
+                    <td class="p-2 text-right">${formatUang(totalRevenue)}</td>
+                    <td class="p-2 text-right">${formatUang(totalCogs)}</td>
+                    <td class="p-2 text-right font-semibold ${profitClass}">${formatUang(r.profit)}</td>
+                    <td class="p-2 text-right">${formatUang(totalStockValue)}</td>
+                    <td class="p-2 text-right font-bold">${formatUang(r.end)}</td>
+                </tr>`;
+            });
+            reportHTML += '</tbody></table>';
+            finalReportDetails.innerHTML = reportHTML;
+        }
+
+        function renderFinalSummary() {
+            const totalProfit = modal - MODAL_AWAL;
+            const profitClass = totalProfit >= 0 ? 'text-green-600' : 'text-red-600';
+            const profitLabel = totalProfit >= 0 ? 'Total Laba' : 'Total Rugi';
+
+            const lastDayReport = dailyReport[dailyReport.length - 1];
+            let finalStockValue = 0;
+            if (lastDayReport) {
+                for (const [item, qty] of Object.entries(lastDayReport.unsold)) {
+                    if (qty > 0) finalStockValue += qty * DAFTAR_BARANG[item].hargaBeli;
+                }
+            }
+
+            let bepDay = 'Tidak Tercapai';
+            let cumulativeProfit = 0;
+            for (const report of dailyReport) {
+                cumulativeProfit += report.profit;
+                if (cumulativeProfit >= 0) {
+                    bepDay = `Hari ke-${report.day}`;
+                    break;
+                }
+            }
+
+            finalSummarySection.innerHTML = `
+                <div class="bg-gray-100 p-3 rounded-lg">
+                    <h5 class="font-semibold text-gray-600">${profitLabel}</h5>
+                    <p class="text-2xl font-bold ${profitClass}">${formatUang(Math.abs(totalProfit))}</p>
+                </div>
+                <div class="bg-gray-100 p-3 rounded-lg">
+                    <h5 class="font-semibold text-gray-600">Nilai Stok Tersisa</h5>
+                    <p class="text-2xl font-bold text-blue-600">${formatUang(finalStockValue)}</p>
+                </div>
+                <div class="bg-gray-100 p-3 rounded-lg">
+                    <h5 class="font-semibold text-gray-600">Break-Even Point (BEP)</h5>
+                    <p class="text-2xl font-bold text-purple-600">${bepDay}</p>
+                </div>
+            `;
+        }
+
+        function showGenericPopup(icon, title, description, callback) {
+            genericPopupIcon.innerText = icon;
+            genericPopupTitle.innerText = title;
+            genericPopupDescription.innerText = description;
+            popupOverlay.classList.remove('hidden');
+            genericPopup.classList.remove('hidden');
+            genericPopupOkButton.onclick = () => {
+                popupOverlay.classList.add('hidden');
+                genericPopup.classList.add('hidden');
+                if (callback) callback();
+            };
+        }
+
+        function downloadHTML(content, filename) {
+            const blob = new Blob([content], { type: 'text/html' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadReportAsCSV(reportData) {
+            const sanitizedName = playerName.replace(/ /g, "_");
+            const sanitizedClass = playerClass.replace(/ /g, "_");
+            let csvContent = "Laporan Hari ke-" + reportData.day + "\n\n";
+            csvContent += "Rincian Penjualan\n";
+            csvContent += "Nama Barang,Harga Beli,Harga Jual,Jumlah Terjual,HPP,Total Jual,Keuntungan\n";
+            
+            let totalRevenue = 0;
+            let totalCogs = 0;
+            let totalQtySold = 0;
+            let totalProfit = 0;
+
+            reportData.salesLog.forEach(sale => {
+                const cogsPerItem = sale.quantity * sale.hargaBeli;
+                totalRevenue += sale.revenue;
+                totalCogs += cogsPerItem;
+                totalQtySold += sale.quantity;
+                totalProfit += sale.profit;
+                csvContent += `${sale.item},${sale.hargaBeli},${sale.hargaJual},${sale.quantity},${cogsPerItem},${sale.revenue},${sale.profit}\n`;
+            });
+            csvContent += `Total,"","",${totalQtySold},${totalCogs},${totalRevenue},${totalProfit}\n\n`;
+
+            csvContent += "Rincian Sisa Stok\n";
+            csvContent += "Nama Barang,Harga Beli,Jumlah Stok,Nilai Stok\n";
+            let totalStockValue = 0;
+            for (const [item, qty] of Object.entries(reportData.unsold)) {
+                if (qty > 0) {
+                    const itemValue = qty * DAFTAR_BARANG[item].hargaBeli;
+                    totalStockValue += itemValue;
+                    csvContent += `${item},${DAFTAR_BARANG[item].hargaBeli},${qty},${itemValue}\n`;
+                }
+            }
+            csvContent += `Total Nilai Sisa Stok,"","",${totalStockValue}\n\n`;
+
+            csvContent += `Ringkasan Hari Ini\n`;
+            csvContent += `Total Penjualan,${totalRevenue}\n`;
+            csvContent += `Modal Barang Terjual (HPP),${totalCogs}\n`;
+            csvContent += `Keuntungan Bersih,${totalRevenue - totalCogs}\n`;
+
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `laporan_${sanitizedName}_${sanitizedClass}_hari_${reportData.day}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadFinalReportAsCSV() {
+            const sanitizedName = playerName.replace(/ /g, "_");
+            const sanitizedClass = playerClass.replace(/ /g, "_");
+            let csvContent = `Laporan Lengkap 7 Hari - ${playerName} ${playerClass}\n\n`;
+            csvContent += "Tabel Laporan Penjualan\n";
+            csvContent += "Hari,Modal Awal,Total Penjualan,Total HPP,Untung/Rugi,Nilai Sisa Stok,Modal Akhir\n";
+
+            dailyReport.forEach(r => {
+                let totalRevenue = 0;
+                let totalCogs = 0;
+                r.salesLog.forEach(sale => {
+                    totalRevenue += sale.revenue;
+                    totalCogs += sale.quantity * sale.hargaBeli;
+                });
+                let totalStockValue = 0;
+                for (const [item, qty] of Object.entries(r.unsold)) {
+                    if (qty > 0) totalStockValue += qty * DAFTAR_BARANG[item].hargaBeli;
+                }
+                csvContent += `${r.day},${r.start},${totalRevenue},${totalCogs},${r.profit},${totalStockValue},${r.end}\n`;
+            });
+
+            csvContent += "\n\nRingkasan Akhir\n";
+            const totalProfit = modal - MODAL_AWAL;
+            const lastDayReport = dailyReport[dailyReport.length - 1];
+            let finalStockValue = 0;
+            if (lastDayReport) {
+                for (const [item, qty] of Object.entries(lastDayReport.unsold)) {
+                    if (qty > 0) finalStockValue += qty * DAFTAR_BARANG[item].hargaBeli;
+                }
+            }
+            let bepDay = 'Tidak Tercapai';
+            let cumulativeProfit = 0;
+            for (const report of dailyReport) {
+                cumulativeProfit += report.profit;
+                if (cumulativeProfit >= 0) {
+                    bepDay = `Hari ke-${report.day}`;
+                    break;
+                }
+            }
+            csvContent += `Total Laba/Rugi,"${formatUang(totalProfit)}"\n`;
+            csvContent += `Nilai Stok Tersisa,"${formatUang(finalStockValue)}"\n`;
+            csvContent += `Break Even Point,"${bepDay}"\n\n`;
+
+            csvContent += "Daftar Istilah\n";
+            csvContent += `"Modal Awal","Uang yang kamu punya di awal hari."\n`;
+            csvContent += `"Total Jual","Total uang yang kamu dapat dari semua penjualan hari itu."\n`;
+            csvContent += `"Total HPP","Total modal dari barang-barang yang laku terjual."\n`;
+            csvContent += `"Untung/Rugi","Hasil dari Total Jual dikurangi Total HPP."\n`;
+            csvContent += `"Sisa Nilai Stok","Nilai semua barang yang tidak laku, dihitung dari harga belinya."\n`;
+            csvContent += `"Modal Akhir","Uang yang kamu punya di akhir hari setelah berjualan."\n`;
+            csvContent += `"BEP (Break-Even Point)","Hari di mana total keuntunganmu pertama kali berhasil menutupi semua kerugian sebelumnya (balik modal)."\n\n`;
+            
+            csvContent += "Kesimpulan dari Mentor Bisnis AI:\n";
+            const adviceText = finalAdviceContent.replace(/<[^>]*>/g, "").replace(/"/g, '""'); // Strip HTML tags and escape quotes
+            csvContent += `"${adviceText}"\n`;
+
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `laporan_lengkap_${sanitizedName}_${sanitizedClass}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadFinalReportAsHTML() {
+            const sanitizedName = playerName.replace(/ /g, "_");
+            const sanitizedClass = playerClass.replace(/ /g, "_");
+            
+            const reportClone = endGameScreen.cloneNode(true);
+            
+            // Remove all interactive/non-report elements
+            reportClone.querySelectorAll('.no-print').forEach(el => el.remove());
+            
+            // FIX: Change title and header
+            reportClone.querySelector('h3').innerText = 'Laporan Penjualan Warung Ceria Selama 7 Hari';
+            reportClone.querySelector('#final-report-header').innerHTML = `<p><span class="font-semibold">Pemilik Warung:</span> ${playerName}</p><p><span class="font-semibold">Kelas:</span> ${playerClass}</p>`;
+
+            // FIX: Remove scrollbar from the table
+            reportClone.querySelector('#final-report-details').classList.remove('max-h-64', 'overflow-y-auto');
+
+            // FIX: Expand the "Keterangan Istilah" section
+            const detailsElement = reportClone.querySelector('details');
+            if (detailsElement) {
+                const newDiv = document.createElement('div');
+                newDiv.className = detailsElement.className; // Copy classes
+                newDiv.innerHTML = `<h4 class="cursor-pointer font-semibold text-gray-700">Keterangan Istilah</h4>` + detailsElement.querySelector('ul').outerHTML;
+                detailsElement.parentNode.replaceChild(newDiv, detailsElement);
+            }
+
+            const reportHTML = reportClone.innerHTML;
+            
+            const fullHTML = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Laporan Akhir - ${playerName} ${playerClass}</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Baloo 2', cursive; padding: 2rem; }
+                        .no-print { display: none !important; } /* Ensure it's hidden */
+                    </style>
+                </head>
+                <body>
+                    <div class="w-full max-w-4xl mx-auto text-center">
+                        ${reportHTML}
+                    </div>
+                </body>
+                </html>
+            `;
+            downloadHTML(fullHTML, `laporan_akhir_${sanitizedName}_${sanitizedClass}.html`);
+        }
+
+        // --- Integrasi API Gemini ---
+        
+        async function getDailyScenarioFromGemini() {
+            const daftarBarangValid = Object.keys(DAFTAR_BARANG).join(', ');
+            const prompt = `Buatkan sebuah skenario untuk game warung jajan anak-anak di sekolah. Skenario harus berisi "event" yang merupakan informasi acara untuk hari ini, dan daftar 3-5 "customers" yang permintaannya dipengaruhi oleh event tersebut. Nama barang yang diminta pelanggan HARUS salah satu dari ini: ${daftarBarangValid}. PENTING: Buat event bervariasi. Kadang-kadang, buatlah event "Tidak ada acara khusus hari ini, hanya aktivitas sekolah biasa." Pada hari biasa, permintaan pelanggan harus seimbang dan tidak condong ke satu jenis barang. Respons harus berupa objek JSON yang valid tanpa markdown. Contoh event spesial: { "event": { "description": "Hari ini ada lomba lari di lapangan sekolah, sepertinya minuman dingin dan es krim akan sangat laku!" }, "customers": [ { "name": "Budi", "requestItem": "Minuman", "quantity": 2 }, { "name": "Ani", "requestItem": "Es Krim", "quantity": 1 } ] } Contoh hari biasa: { "event": { "description": "Tidak ada acara khusus hari ini, hanya aktivitas sekolah biasa." }, "customers": [ { "name": "Rina", "requestItem": "Roti", "quantity": 1 }, { "name": "Dodi", "requestItem": "Keripik", "quantity": 1 } ] }`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) {
+                const errorBody = await response.text();
+                console.error("API Error:", errorBody);
+                throw new Error(`API call failed with status: ${response.status}`);
+            }
+            const result = await response.json();
+             if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                let text = result.candidates[0].content.parts[0].text;
+                const jsonMatch = text.match(/```(json)?\s*([\s\S]*?)\s*```/);
+                if (jsonMatch && jsonMatch[2]) {
+                    text = jsonMatch[2];
+                }
+                try {
+                    let parsedData = JSON.parse(text);
+                    if (Array.isArray(parsedData)) {
+                        const randomIndex = Math.floor(Math.random() * parsedData.length);
+                        return parsedData[randomIndex];
+                    }
+                    return parsedData;
+                } catch (e) {
+                    console.error("Gagal mem-parsing JSON dari Gemini:", text);
+                    throw new Error("Gagal memproses respons dari AI. Respons bukan JSON yang valid.");
+                }
+            }
+            throw new Error("Respons API tidak valid atau kosong.");
+        }
+        
+        async function getBusinessAdvice() {
+            if (dayActionButton.dataset.state !== 'shop') return;
+            adviceButton.disabled = true;
+            adviceButton.innerText = "Meminta...";
+            const stokSaatIni = Object.entries(stokWarung).filter(([, jumlah]) => jumlah > 0).map(([nama, jumlah]) => `${nama}: ${jumlah} buah`).join(', ') || 'tidak ada';
+            const prompt = `Kamu adalah mentor bisnis ramah untuk anak-anak. Berikan satu saran bisnis singkat (1-2 kalimat) untuk anak yang bermain game jualan. Kondisi saat ini: Hari ke-${hari}, Uang modal: Rp ${modal}, Stok barang: ${stokSaatIni}. Buatlah saran yang relevan dan positif.`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error('Gagal mendapat saran');
+                const result = await response.json();
+                const adviceText = result.candidates[0].content.parts[0].text;
+                showGenericPopup("?", "Saran Bisnis", adviceText);
+            } catch (error) {
+                showGenericPopup("??", "Oops!", "Gagal mendapatkan saran dari mentor. Coba lagi nanti.");
+            } finally {
+                adviceButton.disabled = false;
+                adviceButton.innerText = "? Tanya Mentor Bisnis";
+            }
+        }
+
+        async function getFinalAdviceFromGemini() {
+            const totalProfit = modal - MODAL_AWAL;
+            const kesimpulanAwal = totalProfit >= 0 ? `Secara keseluruhan kamu UNTUNG sebesar ${formatUang(totalProfit)}` : `Secara keseluruhan kamu RUGI sebesar ${formatUang(Math.abs(totalProfit))}`;
+            const laporanString = dailyReport.map(r => {
+                const soldItems = Object.keys(r.sold).length > 0 ? `Laku: ${Object.entries(r.sold).map(([item,qty]) => `${item} ${qty}`).join(', ')}` : 'Tidak ada yg laku.';
+                const unsoldValue = Object.entries(r.unsold).reduce((acc, [item, qty]) => acc + (qty * DAFTAR_BARANG[item].hargaBeli), 0);
+                return `Hari ${r.day}: untung/rugi ${formatUang(r.profit)}. ${soldItems}. Sisa stok senilai ${formatUang(unsoldValue)}.`;
+            }).join('; ');
+
+            const prompt = `Anda adalah seorang mentor bisnis yang bijak dan positif. Berbicaralah dengan bahasa yang sederhana dan mudah dimengerti oleh anak SD. Seorang anak telah menyelesaikan 7 hari berjualan dalam sebuah game. Hasilnya: ${kesimpulanAwal}. Rincian hariannya adalah: ${laporanString}. Berdasarkan data ini, berikan kesimpulan akhir dan jawab pertanyaan strategis ini: "apakah lebih baik selalu belanja barang baru tiap hari untuk mengikuti event, atau lebih baik menghabiskan stok yang ada dulu?". Berikan jawaban yang mempertimbangkan kedua sisi. Gunakan format HTML paragraf.`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error('Gagal mendapat saran akhir');
+            const result = await response.json();
+            return result.candidates[0].content.parts[0].text;
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('start-button').addEventListener('click', startGame);
+        playAgainButton.addEventListener('click', initGame);
+        downloadFinalHTMLButton.addEventListener('click', downloadFinalReportAsHTML);
+        downloadFinalCSVButton.addEventListener('click', downloadFinalReportAsCSV);
+        downloadAdviceButton.addEventListener('click', () => {
+            const sanitizedName = playerName.replace(/ /g, "_");
+            const sanitizedClass = playerClass.replace(/ /g, "_");
+            const adviceHTML = `
+                <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Saran Mentor - ${playerName}</title>
+                <style>body { font-family: sans-serif; line-height: 1.6; padding: 20px; }</style></head>
+                <body><h1>Saran dari Mentor Bisnis AI</h1>${finalAdviceContent}</body></html>
+            `;
+            downloadHTML(adviceHTML, `saran_mentor_${sanitizedName}_${sanitizedClass}.html`);
+        });
+        rulesOkButton.addEventListener('click', proceedToGame);
+        continueToNextDayButton.addEventListener('click', () => {
+            popupOverlay.classList.add('hidden');
+            dailySummaryPopup.classList.add('hidden');
+            prepareNextDay();
+        });
+        closeSummaryButton.addEventListener('click', () => {
+            popupOverlay.classList.add('hidden');
+            dailySummaryPopup.classList.add('hidden');
+        });
+        adviceButton.addEventListener('click', getBusinessAdvice);
+        grosirItemsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('buy-button')) beliBarang(e.target.dataset.item); });
+        dayActionButton.addEventListener('click', handleDayAction);
+        archiveReportSection.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const day = parseInt(target.dataset.day);
+            const report = dailyReport.find(r => r.day === day);
+            if (!report) return;
+
+            if (target.classList.contains('view-detail-btn')) {
+                showDailySummary(report, true); // true indicates it's an archive view
+            } else if (target.classList.contains('download-archive-btn')) {
+                downloadReportAsCSV(report);
+            }
+        });
+
+        // --- Inisialisasi Awal ---
+        initGame();
+    </script>
+
+</body>
+</html>
+?
