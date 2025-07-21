@@ -114,16 +114,16 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 class="text-3xl font-bold text-orange-500 mb-4">?? Grosir</h2>
+                    <h2 class="text-3xl font-bold text-orange-500 mb-4">🛒 Grosir</h2>
                     <div id="grosir-items" class="space-y-3"></div>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col">
                     <div>
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-3xl font-bold text-teal-500">?? Warungku</h2>
+                            <h2 class="text-3xl font-bold text-teal-500">🏠 Warungku</h2>
                             <button id="advice-button" class="shine-button relative overflow-hidden bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold py-2 px-4 rounded-full text-sm shadow-lg transition-transform transform hover:scale-105">
-                                ? Tanya Mentor Bisnis
+                                ✨ Tanya Mentor Bisnis
                             </button>
                         </div>
                         <div id="warung-items" class="space-y-3 mb-4"></div>
@@ -160,13 +160,13 @@
     <div id="popup-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50 p-4">
         
         <div id="rules-popup" class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full hidden">
-            <div class="text-6xl mb-4">??</div>
+            <div class="text-6xl mb-4">📖</div>
             <h3 class="text-3xl font-bold text-sky-500 mb-4">Cara Main</h3>
             <ul class="text-left space-y-3 text-lg mb-6">
-                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Lihat "Informasi Acara Sekolah Hari Ini" untuk dapat bocoran.</li>
-                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Belanja barang di 'Grosir' sesuai informasi acara hari ini.</li>
-                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Layani pelanggan untuk dapat uang.</li>
-                <li class="flex items-center"><span class="text-3xl mr-3">??</span> Dapatkan untung terbesar selama 7 hari!</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">🔮</span> Lihat "Informasi Acara Sekolah Hari Ini" untuk dapat bocoran.</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">🛒</span> Belanja barang di 'Grosir' sesuai informasi acara hari ini.</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">😊</span> Layani pelanggan untuk dapat uang.</li>
+                <li class="flex items-center"><span class="text-3xl mr-3">🏆</span> Dapatkan untung terbesar selama 7 hari!</li>
             </ul>
             <button id="rules-ok-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full text-xl">Mengerti!</button>
         </div>
@@ -180,7 +180,7 @@
         </div>
 
         <div id="generic-popup" class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-sm w-full hidden">
-            <div id="generic-popup-icon" class="text-6xl mb-4">??</div>
+            <div id="generic-popup-icon" class="text-6xl mb-4">🎉</div>
             <h3 id="generic-popup-title" class="text-3xl font-bold text-yellow-500 mb-2"></h3>
             <p id="generic-popup-description" class="text-lg"></p>
             <button id="generic-popup-ok-button" class="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-full">Asiiik!</button>
@@ -204,7 +204,7 @@
     <!-- Layar Akhir Permainan Full Screen -->
     <div id="end-game-screen" class="bg-white w-full h-full p-8 flex-col items-center justify-center hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="w-full max-w-4xl mx-auto text-center">
-            <div class="text-6xl mb-4 no-print">??</div>
+            <div class="text-6xl mb-4 no-print">🏆</div>
             <h3 class="text-4xl font-bold text-green-500 mb-2">Laporan Penjualan Warung Cilik Ceria Selama 7 Hari</h3>
             <div id="final-report-header" class="text-lg mb-4"></div>
             <div id="final-report-details" class="text-left border rounded-lg p-2 max-h-64 overflow-y-auto mb-4"></div>
@@ -248,12 +248,12 @@
     <script>
         // --- Konfigurasi Game ---
         const DAFTAR_BARANG = {
-            'Permen': { emoji: '?', hargaBeli: 500 },
-            'Cokelat': { emoji: '??', hargaBeli: 2000 },
-            'Es Krim': { emoji: '??', hargaBeli: 3000 },
-            'Minuman': { emoji: '??', hargaBeli: 2500 },
-            'Keripik': { emoji: '??', hargaBeli: 1500 },
-            'Roti': { emoji: '??', hargaBeli: 4000 },
+            'Permen': { emoji: '�', hargaBeli: 500 },
+            'Cokelat': { emoji: '🍫', hargaBeli: 2000 },
+            'Es Krim': { emoji: '🍦', hargaBeli: 3000 },
+            'Minuman': { emoji: '🥤', hargaBeli: 2500 },
+            'Keripik': { emoji: '🥔', hargaBeli: 1500 },
+            'Roti': { emoji: '🍞', hargaBeli: 4000 },
         };
         const MODAL_AWAL = 25000;
         const TOTAL_HARI = 7;
@@ -330,11 +330,11 @@
             const apiKeyInput = document.getElementById('api-key').value;
 
             if (!playerName || !playerClass) {
-                showGenericPopup("??", "Oops!", "Nama dan Kelas harus diisi ya.");
+                showGenericPopup("😥", "Oops!", "Nama dan Kelas harus diisi ya.");
                 return;
             }
             if (!apiKeyInput) {
-                showGenericPopup("??", "Oops!", "Kamu harus memasukkan Kode API Gemini untuk bermain.");
+                showGenericPopup("😥", "Oops!", "Kamu harus memasukkan Kode API Gemini untuk bermain.");
                 return;
             }
             userApiKey = apiKeyInput;
@@ -415,7 +415,7 @@
                 stokWarung[namaBarang] = (stokWarung[namaBarang] || 0) + 1;
                 updateTampilan();
             } else {
-                showGenericPopup("??", "Oops!", "Wah, uangmu tidak cukup untuk membeli itu!");
+                showGenericPopup("😥", "Oops!", "Wah, uangmu tidak cukup untuk membeli itu!");
             }
         }
 
@@ -436,7 +436,7 @@
                 try {
                     currentDayData = await getDailyScenarioFromGemini();
                     if (currentDayData && currentDayData.event && typeof currentDayData.event.description !== 'undefined' && currentDayData.customers) {
-                        showGenericPopup("??", "Informasi Acara Sekolah Hari Ini", currentDayData.event.description, () => {
+                        showGenericPopup("🔮", "Informasi Acara Sekolah Hari Ini", currentDayData.event.description, () => {
                             dayActionButton.dataset.state = 'shop';
                             dayActionButton.innerText = "Mulai Layani Pelanggan";
                             dayActionButton.disabled = false;
@@ -456,7 +456,7 @@
                         errorMessage = "Gagal memproses data dari AI karena struktur tidak sesuai. Coba lagi.";
                     }
                     console.error(error); // Log the full error for debugging
-                    showGenericPopup("??", "Error", errorMessage, resetDayActionButton);
+                    showGenericPopup("🔌", "Error", errorMessage, resetDayActionButton);
                 }
             } else if (state === 'shop') {
                 dayActionButton.disabled = true;
@@ -549,11 +549,11 @@
                             customerFeedback.innerText = `Maaf kurang ${quantityMissing} buah karena stok kurang`;
                             customerFeedback.className = 'mt-4 text-xl font-bold text-orange-500';
                         } else {
-                            customerFeedback.innerText = 'Terima kasih! ??';
+                            customerFeedback.innerText = 'Terima kasih! 😊';
                             customerFeedback.className = 'mt-4 text-xl font-bold text-green-500';
                         }
                     } else {
-                        customerFeedback.innerText = 'Yah, habis... ??';
+                        customerFeedback.innerText = 'Yah, habis... 😞';
                         customerFeedback.className = 'mt-4 text-xl font-bold text-red-500';
                     }
                     updateTampilan();
@@ -1068,12 +1068,12 @@
                 if (!response.ok) throw new Error('Gagal mendapat saran');
                 const result = await response.json();
                 const adviceText = result.candidates[0].content.parts[0].text;
-                showGenericPopup("?", "Saran Bisnis", adviceText);
+                showGenericPopup("✨", "Saran Bisnis", adviceText);
             } catch (error) {
-                showGenericPopup("??", "Oops!", "Gagal mendapatkan saran dari mentor. Coba lagi nanti.");
+                showGenericPopup("😥", "Oops!", "Gagal mendapatkan saran dari mentor. Coba lagi nanti.");
             } finally {
                 adviceButton.disabled = false;
-                adviceButton.innerText = "? Tanya Mentor Bisnis";
+                adviceButton.innerText = "✨ Tanya Mentor Bisnis";
             }
         }
 
@@ -1144,4 +1144,4 @@
 
 </body>
 </html>
-?
+�
