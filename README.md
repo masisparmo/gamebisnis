@@ -6,6 +6,8 @@
 
 Game ini bersifat dinamis, di mana setiap harinya akan ada "Informasi Acara Sekolah" yang berbeda-beda (dihasilkan oleh AI Gemini) yang akan memengaruhi permintaan pelanggan. Pemain harus pintar-pintar membaca situasi, membeli stok barang yang tepat, dan melayani pelanggan untuk mencapai target. Di akhir permainan, pemain akan mendapatkan laporan keuangan lengkap beserta analisis dan saran dari "Mentor Bisnis AI".
 
+Akses ke game ini, silahkan kunjungi [https://gamebisnis.isparmo.com/](https://gamebisnis.isparmo.com/)
+
 ## **2\. Tujuan**
 
 Tujuan utama dari game ini adalah sebagai media edukasi yang menyenangkan (edutainment) dengan beberapa target pembelajaran:
