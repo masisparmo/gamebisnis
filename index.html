@@ -1026,7 +1026,7 @@
             const daftarBarangValid = Object.keys(DAFTAR_BARANG).join(', ');
             const prompt = `Buatkan sebuah skenario untuk game warung jajan anak-anak di sekolah. Skenario harus berisi "event" yang merupakan informasi acara untuk hari ini, dan daftar 3-5 "customers" yang permintaannya dipengaruhi oleh event tersebut. Nama barang yang diminta pelanggan HARUS salah satu dari ini: ${daftarBarangValid}. PENTING: Buat event bervariasi. Kadang-kadang, buatlah event "Tidak ada acara khusus hari ini, hanya aktivitas sekolah biasa." Pada hari biasa, permintaan pelanggan harus seimbang dan tidak condong ke satu jenis barang. Respons harus berupa objek JSON yang valid tanpa markdown. Contoh event spesial: { "event": { "description": "Hari ini ada lomba lari di lapangan sekolah, sepertinya minuman dingin dan es krim akan sangat laku!" }, "customers": [ { "name": "Budi", "requestItem": "Minuman", "quantity": 2 }, { "name": "Ani", "requestItem": "Es Krim", "quantity": 1 } ] } Contoh hari biasa: { "event": { "description": "Tidak ada acara khusus hari ini, hanya aktivitas sekolah biasa." }, "customers": [ { "name": "Rina", "requestItem": "Roti", "quantity": 1 }, { "name": "Dodi", "requestItem": "Keripik", "quantity": 1 } ] }`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
             const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) {
                 const errorBody = await response.text();
@@ -1062,7 +1062,7 @@
             const stokSaatIni = Object.entries(stokWarung).filter(([, jumlah]) => jumlah > 0).map(([nama, jumlah]) => `${nama}: ${jumlah} buah`).join(', ') || 'tidak ada';
             const prompt = `Kamu adalah mentor bisnis ramah untuk anak-anak. Berikan satu saran bisnis singkat (1-2 kalimat) untuk anak yang bermain game jualan. Kondisi saat ini: Hari ke-${hari}, Uang modal: Rp ${modal}, Stok barang: ${stokSaatIni}. Buatlah saran yang relevan dan positif.`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) throw new Error('Gagal mendapat saran');
@@ -1088,7 +1088,7 @@
 
             const prompt = `Anda adalah seorang mentor bisnis yang bijak dan positif. Berbicaralah dengan bahasa yang sederhana dan mudah dimengerti oleh anak SD. Seorang anak telah menyelesaikan 7 hari berjualan dalam sebuah game. Hasilnya: ${kesimpulanAwal}. Rincian hariannya adalah: ${laporanString}. Berdasarkan data ini, berikan kesimpulan akhir dan jawab pertanyaan strategis ini: "apakah lebih baik selalu belanja barang baru tiap hari untuk mengikuti event, atau lebih baik menghabiskan stok yang ada dulu?". Berikan jawaban yang mempertimbangkan kedua sisi. Gunakan format HTML paragraf.`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
             const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) throw new Error('Gagal mendapat saran akhir');
             const result = await response.json();
