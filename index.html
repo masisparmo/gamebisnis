@@ -68,14 +68,31 @@
 </head>
 <body class="bg-sky-100 text-gray-800">
 
+    <!-- Navigasi Atas -->
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-40">
+        <div class="container mx-auto flex justify-between items-center max-w-5xl">
+            <div class="text-xl font-bold text-sky-500 cursor-pointer flex items-center gap-2" onclick="initGame()">
+                <span class="text-2xl">🏪</span> Warung Sekolah Ceria
+            </div>
+            <div class="space-x-4">
+                <button onclick="initGame()" class="text-gray-600 hover:text-sky-500 font-bold transition-colors">
+                    🏠 Home
+                </button>
+                <button id="guide-button" class="text-gray-600 hover:text-sky-500 font-bold transition-colors">
+                    📖 Panduan
+                </button>
+            </div>
+        </div>
+    </nav>
+
     <!-- Kontainer Utama Game -->
-    <div id="game-container" class="container mx-auto p-4 max-w-5xl">
+    <div id="game-container" class="container mx-auto p-4 max-w-5xl mt-2">
 
         <!-- Layar Mulai -->
         <div id="start-screen" class="text-center p-8 bg-white rounded-2xl shadow-xl">
             <h1 class="text-5xl font-bold text-sky-500 mb-2">Warung Sekolah Ceria</h1>
             <p class="text-xl mb-4">Ayo Belajar Jualan & Jadi Pengusaha Sejak Dini</p>
-            
+
             <div class="max-w-md mx-auto text-left space-y-4 mb-6">
                 <div>
                     <label for="player-name" class="block text-lg font-semibold mb-1">Nama Kamu:</label>
@@ -146,7 +163,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center mt-6">
                 <button id="day-action-button" data-state="forecast" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full text-2xl shadow-lg transition-transform transform hover:scale-105">
                     Lihat Informasi Acara Sekolah Hari Ini
@@ -158,10 +175,83 @@
 
     <!-- Modal/Popup (Awalnya Tersembunyi) -->
     <div id="popup-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50 p-4">
-        
+
+        <!-- Popup Panduan Lengkap -->
+        <div id="guide-popup" class="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full hidden max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h3 class="text-3xl font-bold text-sky-600">Panduan Lengkap Warung Sekolah Ceria</h3>
+                <button id="close-guide-button" class="text-gray-500 hover:text-red-500 font-bold text-2xl">&times;</button>
+            </div>
+
+            <div class="space-y-6 text-gray-700 leading-relaxed">
+                <!-- Deskripsi -->
+                <section>
+                    <h4 class="text-xl font-bold text-orange-500 mb-2">📌 Deskripsi Game</h4>
+                    <p>"Warung Sekolah Ceria" adalah game simulasi bisnis di mana kamu berperan sebagai pemilik warung jajanan di sekolah. Kamu akan mengelola modal, stok barang, dan melayani pelanggan selama 7 hari virtual. Tantangannya adalah setiap hari ada acara sekolah yang berbeda (dibuat oleh AI) yang mempengaruhi barang apa yang akan laku keras!</p>
+                </section>
+
+                <!-- Tujuan & Manfaat -->
+                <section>
+                    <h4 class="text-xl font-bold text-teal-500 mb-2">🎯 Tujuan & Manfaat</h4>
+                    <ul class="list-disc list-inside space-y-1 ml-2">
+                        <li><strong>Belajar Bisnis Dasar:</strong> Mengerti modal, harga beli, harga jual, dan keuntungan.</li>
+                        <li><strong>Strategi:</strong> Mengambil keputusan berdasarkan informasi acara sekolah.</li>
+                        <li><strong>Manajemen Stok:</strong> Kapan harus belanja banyak, kapan harus menghabiskan stok.</li>
+                        <li><strong>Literasi Keuangan:</strong> Membaca laporan keuangan sederhana.</li>
+                    </ul>
+                </section>
+
+                <!-- Fitur-Fitur -->
+                <section>
+                    <h4 class="text-xl font-bold text-purple-500 mb-2">✨ Fitur Unggulan</h4>
+                    <ul class="list-disc list-inside space-y-1 ml-2">
+                        <li><strong>Skenario AI Dinamis:</strong> Setiap hari acaranya berbeda, dibuat otomatis oleh Google Gemini AI.</li>
+                        <li><strong>Simulasi 7 Hari:</strong> Siklus permainan pendek tapi menantang.</li>
+                        <li><strong>Sistem Grosir & Warung:</strong> Pengalaman nyata belanja stok dan menjual eceran.</li>
+                        <li><strong>Laporan Keuangan:</strong> Laporan harian dan rekap akhir lengkap dengan grafik sederhana.</li>
+                        <li><strong>Mentor AI:</strong> Dapatkan saran bisnis dan evaluasi akhir dari AI.</li>
+                    </ul>
+                </section>
+
+                <!-- Cara Bermain -->
+                <section>
+                    <h4 class="text-xl font-bold text-green-500 mb-2">🎮 Cara Bermain</h4>
+                    <ol class="list-decimal list-inside space-y-2 ml-2">
+                        <li><strong>Mulai:</strong> Masukkan Nama, Kelas, dan Kode API Gemini.</li>
+                        <li><strong>Cek Info Acara:</strong> Klik tombol biru besar untuk lihat acara sekolah hari ini.</li>
+                        <li><strong>Belanja Stok:</strong> Buka menu "Grosir", beli barang yang sesuai dengan acara sekolah. Hati-hati jangan sampai kehabisan modal!</li>
+                        <li><strong>Jualan:</strong> Klik "Mulai Layani Pelanggan". Layani mereka satu per satu.</li>
+                        <li><strong>Evaluasi:</strong> Lihat laporan harian, lalu lanjut ke hari berikutnya sampai hari ke-7.</li>
+                    </ol>
+                </section>
+
+                <!-- Cara Mendapatkan API Key -->
+                <section>
+                    <h4 class="text-xl font-bold text-blue-500 mb-2">🔑 Cara Mendapatkan Kode API Gemini</h4>
+                    <div class="bg-gray-100 p-4 rounded-lg text-sm">
+                        <p class="mb-2">Game ini butuh "otak" AI dari Google Gemini agar bisa jalan. Gratis kok! Caranya:</p>
+                        <ol class="list-decimal list-inside space-y-1">
+                            <li>Buka situs <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 hover:underline font-bold">Google AI Studio</a>.</li>
+                            <li>Masuk (Login) pakai akun Google kamu.</li>
+                            <li>Klik tombol biru <strong>"Create API key"</strong>.</li>
+                            <li>Pilih "Create API key in new project" jika diminta.</li>
+                            <li>Akan muncul kode panjang yang aneh, itu kodenya! <strong>Salin (Copy)</strong> kode itu.</li>
+                            <li>Kembali ke game ini, lalu <strong>Tempel (Paste)</strong> di kolom "Kode API Gemini".</li>
+                        </ol>
+                    </div>
+                </section>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="guide-ok-button" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105">
+                    Siap Bermain!
+                </button>
+            </div>
+        </div>
+
         <div id="rules-popup" class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full hidden">
             <div class="text-6xl mb-4">📖</div>
-            <h3 class="text-3xl font-bold text-sky-500 mb-4">Cara Main</h3>
+            <h3 class="text-3xl font-bold text-sky-500 mb-4">Cara Main Singkat</h3>
             <ul class="text-left space-y-3 text-lg mb-6">
                 <li class="flex items-center"><span class="text-3xl mr-3">🔮</span> Lihat "Informasi Acara Sekolah Hari Ini" untuk dapat bocoran.</li>
                 <li class="flex items-center"><span class="text-3xl mr-3">🛒</span> Belanja barang di 'Grosir' sesuai informasi acara hari ini.</li>
@@ -200,7 +290,7 @@
         </div>
 
     </div>
-    
+
     <!-- Layar Akhir Permainan Full Screen -->
     <div id="end-game-screen" class="bg-white w-full h-full p-8 flex-col items-center justify-center hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="w-full max-w-4xl mx-auto text-center">
@@ -208,7 +298,7 @@
             <h3 class="text-4xl font-bold text-green-500 mb-2">Laporan Penjualan Warung Cilik Ceria Selama 7 Hari</h3>
             <div id="final-report-header" class="text-lg mb-4"></div>
             <div id="final-report-details" class="text-left border rounded-lg p-2 max-h-64 overflow-y-auto mb-4"></div>
-            
+
             <div id="final-summary-section" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center my-4">
                 <!-- Diisi oleh JS -->
             </div>
@@ -281,6 +371,10 @@
         const dayActionButton = document.getElementById('day-action-button');
         const adviceButton = document.getElementById('advice-button');
         const popupOverlay = document.getElementById('popup-overlay');
+        const guideButton = document.getElementById('guide-button');
+        const guidePopup = document.getElementById('guide-popup');
+        const closeGuideButton = document.getElementById('close-guide-button');
+        const guideOkButton = document.getElementById('guide-ok-button');
         const rulesPopup = document.getElementById('rules-popup');
         const rulesOkButton = document.getElementById('rules-ok-button');
         const customerPopup = document.getElementById('customer-popup');
@@ -316,12 +410,22 @@
             isProcessingDay = false;
             currentDayData = null;
             finalAdviceContent = "";
-            
-            [mainGame, popupOverlay, rulesPopup, customerPopup, genericPopup, dailySummaryPopup, endGameScreen].forEach(el => el.classList.add('hidden'));
+
+            [mainGame, popupOverlay, rulesPopup, customerPopup, genericPopup, dailySummaryPopup, endGameScreen, guidePopup].forEach(el => el.classList.add('hidden'));
             archiveReportSection.classList.add('hidden');
             startScreen.classList.remove('hidden');
             updateTampilan();
             updateLiveSalesReport();
+        }
+
+        function showGuide() {
+            popupOverlay.classList.remove('hidden');
+            guidePopup.classList.remove('hidden');
+        }
+
+        function hideGuide() {
+            popupOverlay.classList.add('hidden');
+            guidePopup.classList.add('hidden');
         }
 
         function startGame() {
@@ -395,7 +499,7 @@
             });
             liveSalesTotal.innerText = `Total: ${formatUang(totalRevenue)}`;
         }
-        
+
         function renderGrosir() {
             grosirItemsContainer.innerHTML = '';
             for (const namaBarang in DAFTAR_BARANG) {
@@ -518,7 +622,7 @@
                 const barangInfo = DAFTAR_BARANG[requestItem];
                 if (!barangInfo) { resolve(); return; }
                 const hargaJual = Math.ceil(barangInfo.hargaBeli * MARKUP_HARGA / 100) * 100;
-                
+
                 customerAvatar.src = `https://placehold.co/100x100/FEF08A/333333?text=${name.charAt(0)}`;
                 customerRequest.innerText = `Halo, aku ${name}! Aku mau beli ${requestItem} ${quantity} buah.`;
                 customerFeedback.innerText = '';
@@ -535,16 +639,16 @@
                         const profitPerSale = revenue - (quantityToSell * barangInfo.hargaBeli);
                         stokWarung[requestItem] -= quantityToSell;
                         modal += revenue;
-                        dailySalesLog.push({ 
-                            item: requestItem, 
-                            quantity: quantityToSell, 
-                            revenue, 
-                            hargaBeli: barangInfo.hargaBeli, 
-                            hargaJual, 
-                            profit: profitPerSale 
+                        dailySalesLog.push({
+                            item: requestItem,
+                            quantity: quantityToSell,
+                            revenue,
+                            hargaBeli: barangInfo.hargaBeli,
+                            hargaJual,
+                            profit: profitPerSale
                         });
                         updateLiveSalesReport();
-                        
+
                         if (quantityMissing > 0) {
                             customerFeedback.innerText = `Maaf kurang ${quantityMissing} buah karena stok kurang`;
                             customerFeedback.className = 'mt-4 text-xl font-bold text-orange-500';
@@ -565,7 +669,7 @@
                 }, 1500);
             });
         }
-        
+
         async function akhirGame() {
             mainGame.classList.add('hidden');
             popupOverlay.classList.add('hidden'); // Hide any open popups
@@ -689,7 +793,7 @@
             `;
 
             downloadReportButton.onclick = () => downloadReportAsCSV(reportData);
-            
+
             if (isArchive) {
                 continueToNextDayButton.classList.add('hidden');
                 closeSummaryButton.classList.remove('hidden');
@@ -708,15 +812,15 @@
                 archiveReportSection.classList.add('hidden');
                 return;
             };
-            
+
             archiveList.innerHTML = ''; // Clear list
-            
+
             dailyReport.forEach(report => {
                 const profitClass = report.profit >= 0 ? 'text-green-600' : 'text-red-600';
-                
+
                 const reportDiv = document.createElement('div');
                 reportDiv.className = 'text-sm bg-gray-100 p-2 rounded';
-                
+
                 const soldText = Object.keys(report.sold).length > 0
                     ? Object.entries(report.sold).map(([item, qty]) => `${DAFTAR_BARANG[item].emoji} (x${qty})`).join(' ')
                     : 'Tidak ada';
@@ -743,7 +847,7 @@
 
             archiveReportSection.classList.remove('hidden');
         }
-        
+
         function renderFinalReportHeader() {
             finalReportHeader.innerHTML = `
                 <p><span class="font-semibold">Nama:</span> ${playerName}</p>
@@ -861,7 +965,7 @@
             let csvContent = "Laporan Hari ke-" + reportData.day + "\n\n";
             csvContent += "Rincian Penjualan\n";
             csvContent += "Nama Barang,Harga Beli,Harga Jual,Jumlah Terjual,HPP,Total Jual,Keuntungan\n";
-            
+
             let totalRevenue = 0;
             let totalCogs = 0;
             let totalQtySold = 0;
@@ -955,7 +1059,7 @@
             csvContent += `"Sisa Nilai Stok","Nilai semua barang yang tidak laku, dihitung dari harga belinya."\n`;
             csvContent += `"Modal Akhir","Uang yang kamu punya di akhir hari setelah berjualan."\n`;
             csvContent += `"BEP (Break-Even Point)","Hari di mana total keuntunganmu pertama kali berhasil menutupi semua kerugian sebelumnya (balik modal)."\n\n`;
-            
+
             csvContent += "Kesimpulan dari Mentor Bisnis AI:\n";
             const adviceText = finalAdviceContent.replace(/<[^>]*>/g, "").replace(/"/g, '""'); // Strip HTML tags and escape quotes
             csvContent += `"${adviceText}"\n`;
@@ -973,12 +1077,12 @@
         function downloadFinalReportAsHTML() {
             const sanitizedName = playerName.replace(/ /g, "_");
             const sanitizedClass = playerClass.replace(/ /g, "_");
-            
+
             const reportClone = endGameScreen.cloneNode(true);
-            
+
             // Remove all interactive/non-report elements
             reportClone.querySelectorAll('.no-print').forEach(el => el.remove());
-            
+
             // FIX: Change title and header
             reportClone.querySelector('h3').innerText = 'Laporan Penjualan Warung Ceria Selama 7 Hari';
             reportClone.querySelector('#final-report-header').innerHTML = `<p><span class="font-semibold">Pemilik Warung:</span> ${playerName}</p><p><span class="font-semibold">Kelas:</span> ${playerClass}</p>`;
@@ -996,7 +1100,7 @@
             }
 
             const reportHTML = reportClone.innerHTML;
-            
+
             const fullHTML = `
                 <!DOCTYPE html>
                 <html lang="id">
@@ -1021,7 +1125,7 @@
         }
 
         // --- Integrasi API Gemini ---
-        
+
         async function getDailyScenarioFromGemini() {
             const daftarBarangValid = Object.keys(DAFTAR_BARANG).join(', ');
             const prompt = `Buatkan sebuah skenario untuk game warung jajan anak-anak di sekolah. Skenario harus berisi "event" yang merupakan informasi acara untuk hari ini, dan daftar 3-5 "customers" yang permintaannya dipengaruhi oleh event tersebut. Nama barang yang diminta pelanggan HARUS salah satu dari ini: ${daftarBarangValid}. PENTING: Buat event bervariasi. Kadang-kadang, buatlah event "Tidak ada acara khusus hari ini, hanya aktivitas sekolah biasa." Pada hari biasa, permintaan pelanggan harus seimbang dan tidak condong ke satu jenis barang. Respons harus berupa objek JSON yang valid tanpa markdown. Contoh event spesial: { "event": { "description": "Hari ini ada lomba lari di lapangan sekolah, sepertinya minuman dingin dan es krim akan sangat laku!" }, "customers": [ { "name": "Budi", "requestItem": "Minuman", "quantity": 2 }, { "name": "Ani", "requestItem": "Es Krim", "quantity": 1 } ] } Contoh hari biasa: { "event": { "description": "Tidak ada acara khusus hari ini, hanya aktivitas sekolah biasa." }, "customers": [ { "name": "Rina", "requestItem": "Roti", "quantity": 1 }, { "name": "Dodi", "requestItem": "Keripik", "quantity": 1 } ] }`;
@@ -1054,7 +1158,7 @@
             }
             throw new Error("Respons API tidak valid atau kosong.");
         }
-        
+
         async function getBusinessAdvice() {
             if (dayActionButton.dataset.state !== 'shop') return;
             adviceButton.disabled = true;
@@ -1096,6 +1200,9 @@
         }
 
         // --- Event Listeners ---
+        guideButton.addEventListener('click', showGuide);
+        closeGuideButton.addEventListener('click', hideGuide);
+        guideOkButton.addEventListener('click', hideGuide);
         document.getElementById('start-button').addEventListener('click', startGame);
         playAgainButton.addEventListener('click', initGame);
         downloadFinalHTMLButton.addEventListener('click', downloadFinalReportAsHTML);
